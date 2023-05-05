@@ -4,7 +4,7 @@ This is the repository for [Payload's official website](https://payloadcms.com/)
 
 <img src="https://payloadcms.com/images/og-image.jpg" alt="Payload headless CMS website" />
 
-This site showcases lots of cool stuff like how to use Payload's GraphQL API to its fullest extent, how to build a super dynamic light / dark mode into a Next site without any first-load flickering, how to render remotely stored docs from MDX to Next.js pages, how to use Stripe to build a custom SaaS integration, and much more.  
+This site showcases lots of cool stuff like how to use Payload's GraphQL API to its fullest extent, how to build a super dynamic light / dark mode into a Next site without any first-load flickering, how to render remotely stored docs from MDX to Next.js pages, ewfwef to use Stripe to build a custom SaaS integration, and much more.  
 
 ## ✨ Tech stack
 
