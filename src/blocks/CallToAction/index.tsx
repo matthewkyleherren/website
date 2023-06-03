@@ -10,7 +10,6 @@ import { Label } from '@components/Label'
 import { PixelBackground } from '@components/PixelBackground'
 import { RichText } from '@components/RichText'
 import { Page } from '@root/payload-types'
-import { ThemeProvider } from '@root/providers/Theme'
 
 import classes from './index.module.scss'
 
@@ -26,7 +25,7 @@ export const CallToAction: React.FC<CallToActionProps> = props => {
   return (
     <BlockSpacing>
       <Gutter className={classes.callToAction}>
-        <ThemeProvider theme="dark">
+        <div data-theme="dark">
           <div className={classes.bgWrapper}>
             <Gutter disableMobile className={classes.bgGutter}>
               <div className={classes.bg1}>
@@ -36,14 +35,14 @@ export const CallToAction: React.FC<CallToActionProps> = props => {
               </div>
             </Gutter>
           </div>
-          <Grid className={classes.content}>
+          <Grid className={classes.contentWrap}>
             <Cell cols={6} colsM={8}>
-              <RichText content={richText} />
+              <RichText content={richText} className={classes.content} />
             </Cell>
             <Cell cols={5} start={8} colsM={8} startM={1}>
               {feature === 'cpa' && (
                 <Fragment>
-                  <Label>Get started in one line</Label>
+                  <Label className={classes.label}>Get started in one line</Label>
                   <CreatePayloadApp background={false} className={classes.cpa} />
                 </Fragment>
               )}
@@ -59,7 +58,7 @@ export const CallToAction: React.FC<CallToActionProps> = props => {
               )}
             </Cell>
           </Grid>
-        </ThemeProvider>
+        </div>
       </Gutter>
     </BlockSpacing>
   )

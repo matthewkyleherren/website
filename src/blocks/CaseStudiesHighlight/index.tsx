@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import { useMouseInfo } from '@faceless-ui/mouse-info'
 import { PayloadIcon } from '@graphics/PayloadIcon'
-import { ThemeProvider } from '@providers/Theme'
 import Image from 'next/image'
 import Link from 'next/link'
 
@@ -55,7 +54,7 @@ export const CaseStudiesHighlightBlock: React.FC<Props> = ({
             transform: `translate3d(${(xPercentage - 50) * -0.1}%, 0, 0)`,
           }}
         >
-          <ThemeProvider theme="dark">
+          <div data-theme="darks">
             {caseStudyRows.map((row, i) => {
               return (
                 <ul key={i} className={classes.row}>
@@ -72,7 +71,11 @@ export const CaseStudiesHighlightBlock: React.FC<Props> = ({
 
                     return (
                       <li key={slug} className={classes.imageWrap}>
-                        <Link href={`/case-studies/${slug}`} className={classes.image}>
+                        <Link
+                          href={`/case-studies/${slug}`}
+                          className={classes.image}
+                          prefetch={false}
+                        >
                           <Image src={`${process.env.NEXT_PUBLIC_CMS_URL}${url}`} fill alt={alt} />
                         </Link>
                       </li>
@@ -81,7 +84,7 @@ export const CaseStudiesHighlightBlock: React.FC<Props> = ({
                 </ul>
               )
             })}
-          </ThemeProvider>
+          </div>
         </div>
       </div>
     </React.Fragment>

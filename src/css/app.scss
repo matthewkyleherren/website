@@ -5,6 +5,7 @@
 @import "./colors.scss";
 @import './docsearch.scss';
 @import "./toastify.scss";
+@import "./theme.scss";
 
 :root {
   --base: 24px;
@@ -17,7 +18,7 @@
   --scrollbar-width: 17px;
   --page-padding-top: calc(var(--top-bar-height) + var(--header-height) + var(--base) * 2);
   --header-height: 90px;
-  --top-bar-height: 45px;
+  --top-bar-height: 46px;
 
   --font-body-size: 21px;
 
@@ -70,7 +71,12 @@ html {
   @include body;
   background: var(--theme-bg);
   -webkit-font-smoothing: antialiased;
-  scroll-behavior: smooth;
+  opacity: 0;
+
+  &[data-theme=dark],
+  &[data-theme=light] {
+    opacity: initial;
+  }
 
   &[data-theme=dark] {
     background: var(--color-base-900);

@@ -3,50 +3,47 @@
 .header {
   position: fixed;
   top: var(--top-bar-height);
+  height: var(--header-height);
+  display: flex;
+  align-items: center;
   width: 100%;
   z-index: var(--z-nav);
-  padding: var(--base) 0;
   transition: color 300ms ease;
 
-  &:before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: var(--theme-bg);
-    opacity: 0.85;
-    z-index: -1;
-    transition: opacity 500ms ease-out;
+  &.themeIsSet {
+    &:before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--theme-bg);
+      opacity: 0.85;
+      z-index: -1;
+      transition: opacity 500ms ease-out;
+    }
+    
+    &:after {
+      content: '';
+      display: block;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      backdrop-filter: blur(5px);
+      z-index: -1;
+      opacity: 1;
+      transition: opacity 500ms ease-out;
+    }
   }
   
-  &:after {
-    content: '';
-    display: block;
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    backdrop-filter: blur(5px);
-    z-index: -1;
-    opacity: 1;
-    transition: opacity 500ms ease-out;
-  }
-
-  @include large-break {
-    padding: var(--base) 0;
-  }
 
   @include mobile-header-break {
     &:before, &:after {
       transition: opacity 200ms ease;
     }
-  }
-
-  @include mid-break {
-    padding: calc(var(--base) * .75) 0;
   }
 }
 

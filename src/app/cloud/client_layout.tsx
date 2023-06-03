@@ -22,6 +22,7 @@ const DashboardHeader = () => {
   const successParam = searchParams?.get('success')
   const errorParam = searchParams?.get('error')
   const warningParam = searchParams?.get('warning')
+  let renderTabs = true
 
   // optional `tabLabel` and `crumbLabel` properties determine
   // where whether the item is rendered in the breadcrumbs or tabs, or both
@@ -45,11 +46,8 @@ const DashboardHeader = () => {
     },
   }
 
-  // we know it's a team route if the second segment is not a base route
-  // i.e. /cloud/teams is a team route, /cloud/settings is not
-  // we can do the same for project routes one level deeper
-  const isTeamRoute = segments.length > 1 && routes[segments[1]] === undefined
-
+  const isTeamRoute = team?.slug && segments?.[1] === team.slug
+  const isProjectRoute = isTeamRoute && project?.slug && segments?.[2] === project.slug
   let isSettingsRoute = false
   let maxCrumbs = 3
 
@@ -68,8 +66,6 @@ const DashboardHeader = () => {
 
     isSettingsRoute = segments[2] === 'settings'
   }
-
-  const isProjectRoute = isTeamRoute && segments.length > 2 && routes[segments[2]] === undefined
 
   if (isProjectRoute) {
     routes = {
@@ -102,11 +98,15 @@ const DashboardHeader = () => {
 
     isSettingsRoute = segments[3] === 'settings'
     maxCrumbs = 4
+
+    if (pathname === `/${cloudSlug}/${team?.slug}/${project?.slug}/configure`) {
+      maxCrumbs = 3
+      renderTabs = false
+    }
   }
 
   const failedToDeployApp =
-    project?.infraStatus &&
-    !['notStarted', 'awaitingDatabase', 'deploying'].includes(project.infraStatus)
+    project?.infraStatus && !['notStarted', 'awaitingDatabase'].includes(project.infraStatus)
 
   return (
     <Fragment>
@@ -130,46 +130,48 @@ const DashboardHeader = () => {
           }, [])}
         />
       </Gutter>
-      <Tabs
-        tabs={[
-          ...Object.entries(routes).reduce((acc: any[], [, value]) => {
-            if (value.tabLabel) {
-              const tabURL = `/${cloudSlug}${value.href || ''}`
-              const onTabPath = pathname === tabURL
-              const onSettingsPath = isSettingsRoute && tabURL?.includes('/settings')
-              const isActive = onTabPath || onSettingsPath
+      {renderTabs && (
+        <Tabs
+          tabs={[
+            ...Object.entries(routes).reduce((acc: any[], [, value]) => {
+              if (value.tabLabel) {
+                const tabURL = `/${cloudSlug}${value.href || ''}`
+                const onTabPath = pathname === tabURL
+                const onSettingsPath = isSettingsRoute && tabURL?.includes('/settings')
+                const isActive = onTabPath || onSettingsPath
 
-              const tab = {
-                label: value.tabLabel,
-                url: tabURL,
-                isActive,
-              }
-
-              if (isProjectRoute) {
-                if (project?.infraStatus === 'done') {
-                  // push all tabs for online projects
-                  acc.push(tab)
-                } else {
-                  // always push the overview tab for offline projects
-                  if (tab.label === 'Overview') {
-                    acc.push(tab)
-                  }
-
-                  // push the settings tab for offline projects that made it to DigitalOcean
-                  // (i.e. db creation was successful, but the app failed to deploy, or is deploying)
-                  if (failedToDeployApp && tab.label === 'Settings') {
-                    acc.push(tab)
-                  }
+                const tab = {
+                  label: value.tabLabel,
+                  url: tabURL,
+                  isActive,
                 }
-              } else {
-                acc.push(tab)
-              }
-            }
 
-            return acc
-          }, []),
-        ]}
-      />
+                if (isProjectRoute) {
+                  if (project?.infraStatus === 'done') {
+                    // push all tabs for online projects
+                    acc.push(tab)
+                  } else {
+                    // always push the overview tab for offline projects
+                    if (tab.label === 'Overview') {
+                      acc.push(tab)
+                    }
+
+                    // push the settings tab for offline projects that made it to DigitalOcean
+                    // (i.e. db creation was successful, but the app failed to deploy, or is deploying)
+                    if (failedToDeployApp && tab.label === 'Settings') {
+                      acc.push(tab)
+                    }
+                  }
+                } else {
+                  acc.push(tab)
+                }
+              }
+
+              return acc
+            }, []),
+          ]}
+        />
+      )}
     </Fragment>
   )
 }

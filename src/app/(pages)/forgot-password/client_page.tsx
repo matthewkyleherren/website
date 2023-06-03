@@ -50,8 +50,8 @@ export const ForgotPassword: React.FC = () => {
         const res = await req.json()
 
         dispatchFields({
-          type: 'REPLACE_STATE',
-          state: initialFormState,
+          type: 'RESET',
+          payload: initialFormState,
         })
 
         setSuccessfullySubmitted(true)
@@ -98,7 +98,9 @@ export const ForgotPassword: React.FC = () => {
             <div className={classes.links}>
               <p>
                 {`Ready to login? `}
-                <Link href="/login">Log in now</Link>
+                <Link href="/login" prefetch={false}>
+                  Log in now
+                </Link>
                 {'.'}
               </p>
             </div>
@@ -118,7 +120,9 @@ export const ForgotPassword: React.FC = () => {
           <div className={classes.links}>
             <p>
               {`Know your password? `}
-              <Link href={`/login${canUseDom ? window.location.search : ''}`}>Log in here</Link>
+              <Link href={`/login${canUseDom ? window.location.search : ''}`} prefetch={false}>
+                Log in here
+              </Link>
               {'.'}
             </p>
           </div>

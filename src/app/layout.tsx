@@ -1,12 +1,15 @@
 import React from 'react'
 import { fetchGlobals } from '@graphql'
 import { Providers } from '@providers'
+import { defaultTheme, themeLocalStorageKey } from '@providers/Theme/shared'
 import { Metadata } from 'next'
+import Script from 'next/script'
 
 import { GoogleAnalytics } from '@components/Analytics/GoogleAnalytics'
 import { GoogleTagManager } from '@components/Analytics/GoogleTagManager'
-import { HeaderObserver } from '@components/HeaderObserver'
+import { PrivacyBanner } from '@components/PrivacyBanner'
 import { TopBar } from '@components/TopBar'
+import { PrivacyProvider } from '@root/providers/Privacy'
 import { mergeOpenGraph } from '@root/seo/mergeOpenGraph'
 import { Footer } from '../components/Footer'
 import { Header } from '../components/Header'
@@ -20,32 +23,78 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const { mainMenu, footer, topBar, templates } = await fetchGlobals()
 
   return (
-    <html lang="en">
-      <head>
-        <link rel="icon" href="/images/favicon.svg" />
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@3" />
-        <GoogleAnalytics />
-        <link rel="dns-prefetch" href={process.env.NEXT_PUBLIC_CLOUD_CMS_URL} />
-      </head>
-      <body
-        className={[
-          robotoMono.variable,
-          neueMontrealRegular.variable,
-          neueMontrealBold.variable,
-          neueMontrealItalic.variable,
-        ].join(' ')}
-      >
-        <GoogleTagManager />
-        <Providers templates={templates}>
-          <TopBar {...topBar} />
-          <Header {...mainMenu} />
-          <div className={classes.layout}>
-            <HeaderObserver pullUp>{children}</HeaderObserver>
-            <Footer {...footer} />
-            <div id="docsearch" />
-          </div>
-        </Providers>
-      </body>
+    <html lang="en" suppressHydrationWarning>
+      <PrivacyProvider>
+        <head>
+          {/* eslint-disable-next-line @next/next/no-before-interactive-script-outside-document */}
+          <Script
+            id="theme-script"
+            strategy="beforeInteractive"
+            dangerouslySetInnerHTML={{
+              __html: `
+            (function () {          
+              function getImplicitPreference() {
+                var mediaQuery = '(prefers-color-scheme: dark)'
+                var mql = window.matchMedia(mediaQuery)
+                var hasImplicitPreference = typeof mql.matches === 'boolean'
+          
+                if (hasImplicitPreference) {
+                  return mql.matches ? 'dark' : 'light'
+                }
+          
+                return null
+              }
+          
+              function themeIsValid(theme) {
+                return theme === 'light' || theme === 'dark'
+              }
+          
+              var themeToSet = '${defaultTheme}'
+              var preference = window.localStorage.getItem('${themeLocalStorageKey}')
+          
+              if (themeIsValid(preference)) {
+                themeToSet = preference
+              } else {
+                var implicitPreference = getImplicitPreference()
+          
+                if (implicitPreference) {
+                  themeToSet = implicitPreference
+                }
+              }
+
+              document.documentElement.setAttribute('data-theme', themeToSet)
+            })()`,
+            }}
+          />
+          <link rel="icon" href="/images/favicon.svg" />
+          <link rel="dns-prefetch" href={process.env.NEXT_PUBLIC_CLOUD_CMS_URL} />
+          <link rel="dns-prefetch" href="https://api.github.com/repos/payloadcms/payload" />
+          <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@3" />
+          <link rel="preconnect" href="https://www.googletagmanager.com" />
+          <link rel="preconnect" href="https://www.google-analytics.com" />
+          <GoogleAnalytics />
+        </head>
+        <body
+          className={[
+            robotoMono.variable,
+            neueMontrealRegular.variable,
+            neueMontrealBold.variable,
+            neueMontrealItalic.variable,
+          ].join(' ')}
+        >
+          <GoogleTagManager />
+          <Providers templates={templates}>
+            <TopBar {...topBar} />
+            <Header {...mainMenu} />
+            <div className={classes.layout}>
+              {children}
+              <Footer {...footer} />
+              <div id="docsearch" />
+              <PrivacyBanner />
+            </div>
+          </Providers>
+        </body>
+      </PrivacyProvider>
     </html>
   )
 }

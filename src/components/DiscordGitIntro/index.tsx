@@ -4,7 +4,7 @@ import Link from 'next/link'
 import AuthorTag from '@components/AuthorTag'
 import { DiscordGitBody } from '@components/DiscordGitBody'
 import { FileAttachments } from '@components/FileAttachment'
-import { Attachments } from '@root/app/community-help/discord/[slug]/client_page'
+import { Attachments } from '@root/app/community-help/(posts)/discord/[slug]/client_page'
 
 import classes from './index.module.scss'
 
@@ -37,7 +37,7 @@ export const DiscordGitIntro: React.FC<Props> = ({
   return (
     <Fragment>
       <div className={classes.breadcrumbWrap}>
-        <Link className={classes.breadcrumb} href="/community-help">
+        <Link className={classes.breadcrumb} href="/community-help" prefetch={false}>
           Community Help
         </Link>
       </div>

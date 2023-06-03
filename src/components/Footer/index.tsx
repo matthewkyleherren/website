@@ -20,7 +20,7 @@ import { ThemeLightIcon } from '@root/graphics/ThemeLightIcon'
 import { TwitterIcon } from '@root/graphics/TwitterIcon'
 import { YoutubeIcon } from '@root/graphics/YoutubeIcon'
 import { ChevronUpDownIcon } from '@root/icons/ChevronUpDownIcon'
-import { useHeaderTheme } from '@root/providers/HeaderTheme'
+import { useHeaderObserver } from '@root/providers/HeaderIntersectionObserver'
 import { useThemePreference } from '@root/providers/Theme'
 import { getImplicitPreference, themeLocalStorageKey } from '@root/providers/Theme/shared'
 import { Theme } from '@root/providers/Theme/types'
@@ -31,8 +31,8 @@ import classes from './index.module.scss'
 export const Footer: React.FC<FooterType> = props => {
   const { columns } = props
   const [itemsUnderLogo, documentationItems] = columns ?? []
-  const { setTheme, theme } = useThemePreference()
-  const { setHeaderColor } = useHeaderTheme()
+  const { setTheme } = useThemePreference()
+  const { setHeaderTheme } = useHeaderObserver()
   const selectRef = React.useRef<HTMLSelectElement>(null)
 
   const [buttonClicked, setButtonClicked] = React.useState(false)
@@ -69,12 +69,13 @@ export const Footer: React.FC<FooterType> = props => {
 
   const onThemeChange = (themeToSet: Theme & 'auto') => {
     if (themeToSet === 'auto') {
-      const implicitPreference = getImplicitPreference()
-      setHeaderColor(implicitPreference ?? 'light')
-      setTheme(null)
+      const implicitPreference = getImplicitPreference() ?? 'light'
+      setHeaderTheme(implicitPreference)
+      setTheme(implicitPreference)
+      if (selectRef.current) selectRef.current.value = 'auto'
     } else {
       setTheme(themeToSet)
-      setHeaderColor(themeToSet)
+      setHeaderTheme(themeToSet)
     }
   }
 
@@ -84,7 +85,6 @@ export const Footer: React.FC<FooterType> = props => {
       selectRef.current.value = preference ?? 'auto'
     }
   }, [])
-
   const router = useRouter()
 
   const pathname = usePathname()
@@ -230,6 +230,7 @@ export const Footer: React.FC<FooterType> = props => {
                   target="_blank"
                   rel="noopener noreferrer"
                   className={classes.socialIconLink}
+                  aria-label="Payload's Instagram page"
                 >
                   <InstagramIcon />
                 </a>
@@ -238,6 +239,7 @@ export const Footer: React.FC<FooterType> = props => {
                   target="_blank"
                   rel="noopener noreferrer"
                   className={classes.socialIconLink}
+                  aria-label="Payload's YouTube channel"
                 >
                   <YoutubeIcon />
                 </a>
@@ -246,6 +248,7 @@ export const Footer: React.FC<FooterType> = props => {
                   target="_blank"
                   rel="noopener noreferrer"
                   className={classes.socialIconLink}
+                  aria-label="Payload's Twitter page"
                 >
                   <TwitterIcon />
                 </a>
@@ -254,6 +257,7 @@ export const Footer: React.FC<FooterType> = props => {
                   target="_blank"
                   rel="noopener noreferrer"
                   className={classes.socialIconLink}
+                  aria-label="Payload's Facebook page"
                 >
                   <FacebookIcon />
                 </a>
@@ -269,11 +273,13 @@ export const Footer: React.FC<FooterType> = props => {
             <Cell cols={2} colsM={8} className={classes.themeCell}>
               <div className={classes.selectContainer}>
                 <label htmlFor="theme">
-                  <div className={`${classes.switcherIcon} ${classes.themeIcon}`}>
-                    {!theme && <ThemeAutoIcon />}
-                    {theme === 'light' && <ThemeLightIcon />}
-                    {theme === 'dark' && <ThemeDarkIcon />}
-                  </div>
+                  {selectRef?.current && (
+                    <div className={`${classes.switcherIcon} ${classes.themeIcon}`}>
+                      {selectRef.current.value === 'auto' && <ThemeAutoIcon />}
+                      {selectRef.current.value === 'light' && <ThemeLightIcon />}
+                      {selectRef.current.value === 'dark' && <ThemeDarkIcon />}
+                    </div>
+                  )}
 
                   <select
                     id="theme"

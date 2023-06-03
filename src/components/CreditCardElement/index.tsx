@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react'
 import { CardElement as StripeCardElement } from '@stripe/react-stripe-js'
 
-import { useTheme } from '@root/providers/Theme'
+import { useThemePreference } from '@root/providers/Theme'
 
 import classes from './index.module.scss'
 
 export const CreditCardElement: React.FC = () => {
   const [error, setError] = useState(null)
   const [disableChangeHandler, setDisableChangeHandler] = useState(true)
-  const theme = useTheme()
+  const { theme } = useThemePreference()
   const [style, setStyle] = useState<{ style: Record<string, unknown> }>()
 
   const handleChange = async event => {
@@ -28,6 +28,8 @@ export const CreditCardElement: React.FC = () => {
       theme === 'dark' ? '--color-base-150' : '--color-base-750',
     )
 
+    const autoFillColor = documentStyle.getPropertyValue('--color-base-750')
+
     const errorColor = documentStyle.getPropertyValue('--color-error-500')?.trim()
 
     const lightColor = documentStyle
@@ -46,7 +48,7 @@ export const CreditCardElement: React.FC = () => {
           fontSize: '16px',
           fontSmoothing: 'antialiased',
           ':-webkit-autofill': {
-            color: color,
+            color: autoFillColor,
           },
           '::placeholder': {
             color: lightColor,

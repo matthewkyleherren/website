@@ -8,11 +8,11 @@
     overflow: hidden;
 
     @include mid-break {
-        color: var(--color-base-0);
+        color: var(--color-base-100);
     }
 
     &:hover {
-        color: var(--color-base-0);
+        color: var(--color-base-100);
 
         &:local() {
             .content {
@@ -131,12 +131,6 @@
     @include extra-large-break {
         @include h6;
     }
-
-    @include mid-break {
-        font-size: small;
-        line-height: 1.25;
-        font-weight: bold;
-    }
 }
 
 .arrow {
@@ -154,7 +148,7 @@
 }
 
 .noLink {
-    color: var(--color-base-0);
+    color: var(--color-base-100);
 
     &:local() {
         .content {

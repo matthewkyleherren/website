@@ -17,8 +17,8 @@ export const UniqueSlug: React.FC<{
   collection: 'projects' | 'teams'
   teamID?: string
   label?: string
-  id?: string
-}> = ({ initialValue, collection = 'teams', path = 'slug', label = 'Slug', teamID, id }) => {
+  docID?: string
+}> = ({ initialValue, collection = 'teams', path = 'slug', label = 'Slug', teamID, docID }) => {
   const [value, setValue] = React.useState(initialValue)
   const debouncedValue = useDebounce(value, 100)
   const [isLoading, setIsLoading] = useState<boolean>(false)
@@ -55,32 +55,31 @@ export const UniqueSlug: React.FC<{
                 body: JSON.stringify({
                   slug: debouncedValue,
                   collection,
-                  team: collection === 'projects' ? teamID : undefined,
-                  id,
+                  team: teamID,
+                  id: docID,
                 }),
               },
             )
 
             clearTimeout(timer)
 
-            if (!validityReq.ok) {
+            if (validityReq.ok) {
+              const newValidation: SlugValidationResult = await validityReq.json()
+              dispatchSlugValidation({ type: 'RESET', payload: newValidation })
+            } else {
               const message = `Error validating slug: ${validityReq.statusText}`
               console.error(message) // eslint-disable-line no-console
               setError(message)
               dispatchSlugValidation({ type: 'SET_UNIQUE', payload: false })
-              setIsLoading(false)
-              return
             }
-
-            const newValidation: SlugValidationResult = await validityReq.json()
-            dispatchSlugValidation({ type: 'RESET', payload: newValidation })
           } catch (e) {
             const message = `Error validating slug: ${e.message}`
             console.error(message) // eslint-disable-line no-console
             setError(message)
             dispatchSlugValidation({ type: 'SET_UNIQUE', payload: false })
-            setIsLoading(false)
           }
+
+          setIsLoading(false)
         }
 
         validateSlug()
@@ -92,7 +91,7 @@ export const UniqueSlug: React.FC<{
     return () => {
       clearTimeout(timer)
     }
-  }, [debouncedValue, collection, teamID, initialValue, id])
+  }, [debouncedValue, collection, teamID, initialValue, docID])
 
   const validatedSlug = slugValidation?.slug
   const slugIsValid = validatedSlug && slugValidation?.isUnique
@@ -148,22 +147,24 @@ export const UniqueTeamSlug: React.FC<{
       label="Team Slug"
       path={path}
       collection="teams"
-      id={teamID}
+      docID={teamID}
       initialValue={initialValue}
     />
   )
 }
 
 export const UniqueProjectSlug: React.FC<{
-  teamID: string
+  teamID?: string
+  projectID?: string
   initialValue?: string
-}> = ({ teamID, initialValue }) => {
+}> = ({ teamID, projectID, initialValue }) => {
   return (
     <UniqueSlug
       label="Project Slug"
       path="slug"
       collection="projects"
       teamID={teamID}
+      docID={projectID}
       initialValue={initialValue}
     />
   )
